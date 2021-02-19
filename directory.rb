@@ -1,3 +1,5 @@
+require "CSV"
+
 @students = []
 
 def input_students
@@ -54,24 +56,22 @@ def process(selection)
     puts "I don't know what you meant, try again"
   end
 end
-def save_students
+def save_students(filename = "students.csv")
    # open the file for writing
-   file = File.open("students.csv", "w")
-   # iterate over the array of save_students
-   @students.each do |student|
-     student_data = [student[:name], student[:cohort]]
-     csv_line = student_data.join(",")
-     file.puts csv_line
+   file = File.open(filename, "w")
+   CSV.open("students.csv", "wb") do |csv|
+     # iterate over the array of save_students
+     @students.each do |student|
+       student_data = [student[:name], student[:cohort]]
+       csv << student_data
+     end
    end
-   file.close
 end
 def load_students(filename = "students.csv")
-  file = File.open(filename, "r")
-  file.readlines.each do |line|
-    name, cohort = line.chomp.split(',')
+  CSV.foreach(filename) do |row|
+    name, cohort = row
     @students << {name: name, cohort: cohort.to_sym}
   end
-  file.close
 end
 def try_load_students
   filename = ARGV.first # first argument from the command csv_line
